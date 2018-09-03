@@ -10,22 +10,23 @@
                         :style="prizeItemStyle()"
                         class="prize"
                         :class="{
-                            'prize--target': isTargetPrize(key)
+                            'prize--target': isTargetPrize((itemSetCount - n ) * prizeLength + Object.keys(prizeSet).length + 1 - key  )
                         }">
-                        <span>{{ prizeSet[Object.keys(prizeSet).length + 1 - key] }}</span>
+                        <span>{{ prizeSet[Object.keys(prizeSet).length + 1 - key] }} 
+                            <span class="hint">(第 {{ (itemSetCount - n ) * prizeLength + Object.keys(prizeSet).length + 1 - key }} 個 item)</span>
+                        </span>
                     </div>
                 </div>
             </div>
 
             <div v-if="gameStatus == 0" class="slot-machine__mask">
-                <span v-if="allowPlay">點擊右側拉桿開始!</span>
-                <span v-else>您目前無拉霸兌換卷</span>
+                <span v-if="allowPlay">點擊按鈕開始!</span>
             </div>
         </div>
 
         <div class="slot-machine__handle-wrapper">
-            <div v-if="gameStatus == 0" @click="go">start game!</div>
-            <div v-if="gameStatus == 3" @click="reset">reset game</div>
+            <button v-if="gameStatus == 0" @click="go">start game!</button>
+            <button v-if="gameStatus == 3" @click="reset">reset game</button>
         </div>
     </div>
 </template>
@@ -38,7 +39,7 @@ export default {
         targetPrize: { type: Number }, // 目標獎項
         allowPlay: { type: Boolean }, // 可以繼續下一次抽獎
         prizeLength: { type: Number }, // 獎品長度
-        prizeSet: { type: Object } // 獎項池
+        prizeSet: { type: Object }, // 獎項池
     },
     data() {
         return {
@@ -62,7 +63,7 @@ export default {
             if (this.currentItem > this.prizeLength * this.itemSetCount - 1) {
                 this.itemSetCount += 4;
             }
-        },
+        }
     },
     mounted() {
         // DOM 建立好時決定好每一格的高度
@@ -112,7 +113,7 @@ export default {
             return {
                 transform: this.currentItem < 2
                     ? 'translateY(0px)'
-                    : `translateY(${(this.currentItem - 1) * 39 - 39}px)`
+                    : `translateY(${(this.currentItem - 1) * this.itemHeight - this.itemHeight}px)`
             }
         },
         // 獎品列表的漸變樣式
@@ -135,18 +136,18 @@ export default {
         // 每格獎品的高度
         prizeItemStyle() {
             return {
-                height: `${117 / 3}px`
+                height: `${this.itemHeight}px`
             }
         },
         // 遊戲開始前遮罩
         prizeMaskStyle() {
             return {
-                height: `${117}px`
+                height: `${this.itemHeight * 3}px`
             }
         },
         // 目標獎品
         isTargetPrize(key) {
-            return this.gameStatus == 3 && Object.keys(this.prizeSet).length + 1 - key == this.targetPrize
+            return this.gameStatus == 3 && key == this.currentItem;
         }
     }
 }
@@ -155,7 +156,6 @@ export default {
 <style lang="scss" scoped>
 .slot-machine {
   width: 350px;
-  margin: 30px auto 0px;
   position: relative;
   text-align: center;
 
@@ -168,6 +168,8 @@ export default {
     height: 200px;
     margin: auto;
     overflow: hidden;
+    position: relative;
+    border: 1px solid blue;
   }
 
   &__prize-list {
@@ -175,8 +177,12 @@ export default {
     position: absolute;
     bottom: 0;
 
+    .hint {
+      font-size: 12px;
+      color: gray;
+    }
     .prize {
-      border: 1px solid lightblue;
+      border: 1px solid lightgray;
       display: inline-flex;
       width: 100%;
 
@@ -213,12 +219,17 @@ export default {
   }
 
   &__handle-wrapper {
-    background: rgba(pink, 0.5);
     display: flex;
     width: 100%;
-
-    > div {
-      flex: 1;
+    height: 50px;
+    justify-content: center;
+    margin-top: 10px;
+    > button {
+      border-radius: 5px;
+      background: blue;
+      color: white;
+      outline: none;
+      padding: 10px 20px;
     }
   }
 }
