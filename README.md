@@ -1,5 +1,7 @@
 # slot
 
+[DEMO](https://genepan2641.github.io/vue-slot-machine/)
+
 > A Vue.js project
 
 ## Build Setup
